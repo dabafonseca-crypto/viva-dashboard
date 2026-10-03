@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#ffffff" />
+  <title>Viva Fidelidade — Monitor de Preços</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">V</div>
+        <div>
+          <div class="brand-title">Viva Fidelidade</div>
+          <div class="brand-subtitle">Monitor inteligente de preços</div>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <div id="healthBadge" class="status-pill status-neutral">
+          <span class="status-dot"></span>
+          <span>Carregando</span>
+        </div>
+        <button id="refreshBtn" class="btn btn-primary" type="button">
+          <span class="refresh-icon">↻</span>
+          Atualizar agora
+        </button>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="route-card">
+        <div class="route-main">
+          <div class="eyebrow">ROTA MONITORADA</div>
+          <div class="route-line">
+            <div>
+              <div class="city">Mombaça</div>
+              <div class="state">CE</div>
+            </div>
+            <div class="route-arrow">
+              <div class="route-dot"></div>
+              <div class="route-track"></div>
+              <div class="bus-icon">🚌</div>
+              <div class="route-track"></div>
+              <div class="route-dot"></div>
+            </div>
+            <div class="text-right">
+              <div class="city">Campos Sales</div>
+              <div class="state">CE</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="route-meta">
+          <div>
+            <span class="meta-label">Janela monitorada</span>
+            <strong>00:00–05:59</strong>
+          </div>
+          <div>
+            <span class="meta-label">Coletas</span>
+            <strong>11h e 19h</strong>
+          </div>
+          <div>
+            <span class="meta-label">Alerta</span>
+            <strong>&lt; 3.000 pts</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="filters">
+        <div class="segmented" id="classFilter">
+          <button class="seg-btn active" data-class="TODAS">Todas</button>
+          <button class="seg-btn" data-class="EXECUTIVO">Executivo</button>
+          <button class="seg-btn" data-class="LEITO">Leito</button>
+        </div>
+
+        <label class="select-wrap">
+          <span>Data da viagem</span>
+          <select id="dateFilter">
+            <option value="TODAS">Todas as datas</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="hero-grid">
+        <article class="hero-price-card">
+          <div class="card-head">
+            <div>
+              <div class="eyebrow">MELHOR PREÇO ATUAL</div>
+              <h1 id="heroPoints">—</h1>
+              <div id="heroCash" class="hero-cash">—</div>
+            </div>
+            <div id="heroLevel" class="level-badge level-neutral">Construindo histórico</div>
+          </div>
+
+          <div class="hero-details">
+            <div>
+              <span>Viagem</span>
+              <strong id="heroDate">—</strong>
+            </div>
+            <div>
+              <span>Classe</span>
+              <strong id="heroClass">—</strong>
+            </div>
+            <div>
+              <span>Antecedência</span>
+              <strong id="heroLead">—</strong>
+            </div>
+            <div>
+              <span>Saída</span>
+              <strong id="heroTime">—</strong>
+            </div>
+          </div>
+
+          <div id="dealNotice" class="deal-notice hidden">
+            🔥 Oportunidade abaixo de 3.000 pontos
+          </div>
+        </article>
+
+        <div class="metric-grid">
+          <article class="metric-card">
+            <span class="metric-label">Menor histórico</span>
+            <strong id="minPoints">—</strong>
+            <small id="minPointsSub">pontos</small>
+          </article>
+          <article class="metric-card">
+            <span class="metric-label">Menor adicional</span>
+            <strong id="minCash">—</strong>
+            <small>em R$</small>
+          </article>
+          <article class="metric-card">
+            <span class="metric-label">Variação recente</span>
+            <strong id="variationPoints">—</strong>
+            <small id="variationCash">sem comparação</small>
+          </article>
+          <article class="metric-card">
+            <span class="metric-label">Última coleta</span>
+            <strong id="lastCollection">—</strong>
+            <small id="lastSlot">—</small>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">PRÓXIMOS SÁBADOS</div>
+            <h2>Mapa de preços</h2>
+          </div>
+          <div class="legend">
+            <span><i class="legend-dot low"></i> abaixo de 3.000</span>
+            <span><i class="legend-dot normal"></i> demais preços</span>
+          </div>
+        </div>
+        <div id="dateCards" class="date-cards"></div>
+      </section>
+
+      <section class="chart-grid">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="eyebrow">PONTOS</div>
+              <h2>Histórico de preços</h2>
+            </div>
+            <div class="panel-note">Cada ponto representa uma coleta</div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="pointsChart"></canvas>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="eyebrow">VALOR ADICIONAL</div>
+              <h2>Histórico em R$</h2>
+            </div>
+            <div class="panel-note">Acompanhado separadamente dos pontos</div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="cashChart"></canvas>
+          </div>
+        </article>
+      </section>
+
+      <section class="chart-grid">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="eyebrow">ANTECEDÊNCIA</div>
+              <h2>Com quantos dias fica mais barato?</h2>
+            </div>
+            <div class="panel-note">A análise ganhará precisão com o histórico</div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="leadChart"></canvas>
+          </div>
+        </article>
+
+        <article class="panel insights-panel">
+          <div class="panel-head">
+            <div>
+              <div class="eyebrow">LEITURA ATUAL</div>
+              <h2>Inteligência da rota</h2>
+            </div>
+          </div>
+          <div id="insights" class="insights"></div>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head table-head">
+          <div>
+            <div class="eyebrow">HISTÓRICO COMPLETO</div>
+            <h2>Todas as observações</h2>
+          </div>
+          <div class="table-tools">
+            <input id="tableSearch" class="search-input" type="search" placeholder="Buscar classe, data, pontos..." />
+            <span id="rowCount" class="row-count">0 registros</span>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Coleta</th>
+                <th>Viagem</th>
+                <th>Classe</th>
+                <th>Saída</th>
+                <th>Pontos</th>
+                <th>R$</th>
+                <th>Antecedência</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="historyTable"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="health-grid">
+        <article class="panel compact">
+          <div class="eyebrow">SAÚDE DA AUTOMAÇÃO</div>
+          <div class="health-list">
+            <div><span>Última coleta</span><strong id="healthLast">—</strong></div>
+            <div><span>Registros armazenados</span><strong id="healthRows">—</strong></div>
+            <div><span>Datas disponíveis</span><strong id="healthDates">—</strong></div>
+            <div><span>Primeira data sem viagens</span><strong id="healthStop">—</strong></div>
+          </div>
+        </article>
+
+        <article class="panel compact">
+          <div class="eyebrow">SOBRE A CLASSIFICAÇÃO</div>
+          <p class="muted">
+            “Baixo”, “típico” e “alto” só serão exibidos quando houver histórico suficiente.
+            Até lá, o painel mostra <strong>Construindo histórico</strong> para não criar conclusões artificiais.
+          </p>
+        </article>
+      </section>
+
+      <footer>
+        <span>Viva Fidelidade — monitor privado de preços</span>
+        <span id="footerUpdated">Aguardando dados</span>
+      </footer>
+    </main>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="./config.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
