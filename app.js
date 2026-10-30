@@ -331,7 +331,23 @@
 
     // Chart.js time scale requires an adapter; use category fallback if no adapter.
     const buildCategory=(field)=>{
-      const rows=filteredHistory().filter(x=>x.status==='DISPONIVEL' && x[field]!=null);
+      // Somente nestes dois gráficos: esconder viagens cuja data já passou.
+      // A comparação usa a data de São Paulo, que é o timezone oficial do projeto.
+      const partesHoje = new Intl.DateTimeFormat('pt-BR',{
+        timeZone:'America/Sao_Paulo',
+        year:'numeric',
+        month:'2-digit',
+        day:'2-digit'
+      }).formatToParts(new Date());
+
+      const parte=(tipo)=>partesHoje.find(p=>p.type===tipo)?.value;
+      const hojeISO=`${parte('year')}-${parte('month')}-${parte('day')}`;
+
+      const rows=filteredHistory().filter(x=>
+        x.status==='DISPONIVEL' &&
+        x[field]!=null &&
+        x.data_viagem>=hojeISO
+      );
       const labels=[...new Set(rows.map(r=>fmtDateTime(r.coletado_em)))];
       const groups={};
       rows.forEach(r=>{
